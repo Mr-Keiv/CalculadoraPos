@@ -1,7 +1,5 @@
-import { useRef, useEffect } from "react";
-import { Animated, View, TouchableOpacity, Text, StyleSheet, Dimensions } from "react-native";
-
-const { width } = Dimensions.get("window");
+import { useRef, useEffect, useState } from "react";
+import { Animated, View, TouchableOpacity, Text, StyleSheet, LayoutChangeEvent } from "react-native";
 
 interface CurrencyToggleProps {
   value: boolean; // false = izquierda (USD), true = derecha (EUR)
@@ -17,6 +15,7 @@ export const CurrencyToggle: React.FC<CurrencyToggleProps> = ({
   rightLabel,
 }) => {
   const animatedValue = useRef(new Animated.Value(value ? 1 : 0)).current;
+  const [trackWidth, setTrackWidth] = useState(0);
 
   useEffect(() => {
     Animated.spring(animatedValue, {
@@ -28,25 +27,27 @@ export const CurrencyToggle: React.FC<CurrencyToggleProps> = ({
     }).start();
   }, [value]);
 
-  // Movimiento del thumb
+  // Capturar el ancho real del track
+  const handleLayout = (e: LayoutChangeEvent) => {
+    setTrackWidth(e.nativeEvent.layout.width);
+  };
+
+  // Movimiento dinámico según el ancho real
   const translateX = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, width * 0.4],
+    outputRange: [0, trackWidth / 2], // siempre la mitad del ancho
   });
 
-  // Zoom con rebote
   const scaleAnim = animatedValue.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: [1, 1.1, 1],
+    outputRange: [1, 1.05, 1],
   });
 
-  // Glow dinámico (efecto sombra más intensa cuando está activo)
   const shadowOpacity = animatedValue.interpolate({
     inputRange: [0, 1],
     outputRange: [0.2, 0.5],
   });
 
-  // Color de los labels según activo
   const leftColor = value ? "#cccccc" : "#ffffff";
   const rightColor = value ? "#ffffff" : "#cccccc";
 
@@ -55,21 +56,23 @@ export const CurrencyToggle: React.FC<CurrencyToggleProps> = ({
       <TouchableOpacity
         activeOpacity={0.8}
         style={styles.track}
+        onLayout={handleLayout}
         onPress={() => onValueChange(!value)}
       >
-        {/* Labels siempre visibles */}
+        {/* Labels */}
         <View style={styles.inactiveContainer}>
           <Text style={[styles.inactiveText, { color: leftColor }]}>{leftLabel.text}</Text>
           <Text style={[styles.inactiveText, { color: rightColor }]}>{rightLabel.text}</Text>
         </View>
 
-        {/* Thumb animado con glow */}
+        {/* Thumb */}
         <Animated.View
           style={[
             styles.thumb,
             {
+              width: trackWidth / 2,
               transform: [{ translateX }, { scale: scaleAnim }],
-              shadowOpacity: shadowOpacity,
+              shadowOpacity,
             },
           ]}
         >
@@ -86,22 +89,22 @@ export const CurrencyToggle: React.FC<CurrencyToggleProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: width * 0.8,
+    width: "85%", // se adapta a cualquier pantalla
     alignSelf: "center",
     marginVertical: 10,
   },
   track: {
     width: "100%",
-    height: 44,
-    borderRadius: 22,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: "#0f065a",
     justifyContent: "center",
     padding: 2,
+    overflow: "hidden",
   },
   thumb: {
     position: "absolute",
-    width: "50%",
-    height: 40,
+    height: "100%",
     borderRadius: 20,
     backgroundColor: "#4a21ef",
     justifyContent: "center",
@@ -113,8 +116,9 @@ const styles = StyleSheet.create({
   },
   activeText: {
     color: "#ffffff",
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "600",
+    textAlign: "center",
   },
   inactiveContainer: {
     position: "absolute",
@@ -124,7 +128,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   inactiveText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "600",
   },
 });

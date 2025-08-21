@@ -19,9 +19,7 @@ import CardReader from '../hook/CardReader';
 import TransactionResultModal from '../components/TransactionModal';
 
 const { width, height } = Dimensions.get('window');
-
-// Detectar si es pantalla cuadrada 480x480
-const isSquareScreen = width === 480 && height === 480;
+const isSquareScreen = width === 480 && height === 432;
 
 type Currency = 'USD' | 'EUR';
 
@@ -51,46 +49,37 @@ export default function CurrencyConverterScreen() {
         try {
             const result = await CardReader.processPayment(paymentData);
 
-            // Cerrar el portal primero
             setIsPortalVisible(false);
 
-            // Determinar si la transacción fue exitosa
-            // Puedes ajustar esta lógica según lo que devuelva tu CardReader
             const isSuccess = result && (
                 (result as any).success === true ||
-               (result as any).status === 'success' ||
-               (result as any).responseCode === '00' ||
-                typeof result === 'string' && result.toLowerCase().includes('exitosa')
+                (result as any).status === 'success' ||
+                (result as any).responseCode === '00' ||
+                (typeof result === 'string' && result.toLowerCase().includes('exitosa'))
             );
 
-            // Mostrar modal de resultado
             setTransactionSuccess(isSuccess);
             setTransactionModalVisible(true);
 
-            // Si fue exitoso, resetear el monto
             if (isSuccess) {
                 setAmount('1');
             }
 
         } catch (error) {
             console.error('Error en el pago:', error);
-
-            // Cerrar portal y mostrar modal de error
             setIsPortalVisible(false);
             setTransactionSuccess(false);
             setTransactionModalVisible(true);
-
         }
     };
 
-    // cada vez que cambia la moneda actualizo el selectedRate
     const toggleCurrency = () => {
         const newCurrency = currency === 'USD' ? 'EUR' : 'USD';
         setCurrency(newCurrency);
 
         const found = rates.find(r => r.nombre.toUpperCase().includes(newCurrency));
         if (found) {
-            setSelectedRate(found); // aquí guardas toda la info del rate seleccionado
+            setSelectedRate(found);
         }
     };
 
@@ -126,9 +115,6 @@ export default function CurrencyConverterScreen() {
                                     {lastUpdate?.toLocaleDateString()}
                                 </Text>
                             </View>
-                        </View>
-                        <View>
-
                         </View>
                     </View>
 
@@ -181,7 +167,7 @@ export default function CurrencyConverterScreen() {
 
                     {/* Action Buttons */}
                     <View style={styles.actionButtons}>
-                        <TouchableOpacity style={[styles.simpleBtn, styles.convertBtn]} onPress={() => { setIsPortalVisible(true) }}>
+                        <TouchableOpacity style={[styles.simpleBtn, styles.convertBtn]} onPress={() => setIsPortalVisible(true)}>
                             <Text style={[styles.simpleBtnText, styles.convertBtnText]}>Pagar</Text>
                         </TouchableOpacity>
                     </View>
@@ -214,28 +200,28 @@ const styles = StyleSheet.create({
         flexGrow: 1, 
         justifyContent: 'center', 
         alignItems: 'center', 
-        paddingVertical: isSquareScreen ? 8 : 10 
+        paddingVertical: isSquareScreen ? 6 : 8 
     },
     card: {
-        width: isSquareScreen ? width * 0.92 : width * 3, // 442px en 480x480
-        maxWidth: isSquareScreen ? 442 : 400,
-        borderRadius: isSquareScreen ? 25 : 30,
-        padding: isSquareScreen ? 18 : 24,
+        width: isSquareScreen ? width * 0.9 : width * 0.95,
+        maxWidth: isSquareScreen ? 430 : 380,
+        borderRadius: isSquareScreen ? 22 : 25,
+        padding: isSquareScreen ? 16 : 20,
         position: 'relative',
-        minHeight: isSquareScreen ? height * 0.88 : height * 0.85, // 422px en 480x480
+        minHeight: isSquareScreen ? height * 0.85 : height * 0.82,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.2,
-        shadowRadius: 20,
-        elevation: 10,
-        marginVertical: isSquareScreen ? 8 : 10,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.18,
+        shadowRadius: 18,
+        elevation: 8,
+        marginVertical: isSquareScreen ? 6 : 8,
         backgroundColor: '#0f065a',
     },
     header: { 
         flexDirection: 'row', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        marginBottom: isSquareScreen ? 20 : 30, 
+        marginBottom: isSquareScreen ? 16 : 24, 
         zIndex: 10 
     },
     headerLeft: { 
@@ -243,125 +229,66 @@ const styles = StyleSheet.create({
         alignItems: 'center' 
     },
     logoContainer: { 
-        width: isSquareScreen ? 45 : 55, 
-        height: isSquareScreen ? 45 : 55, 
-        borderRadius: isSquareScreen ? 12 : 15, 
+        width: isSquareScreen ? 42 : 50, 
+        height: isSquareScreen ? 42 : 50, 
+        borderRadius: isSquareScreen ? 10 : 14, 
         backgroundColor: 'rgba(255,255,255,0.9)', 
         justifyContent: 'center', 
         alignItems: 'center', 
-        marginRight: isSquareScreen ? 10 : 12 
+        marginRight: isSquareScreen ? 8 : 10 
     },
     logo: { 
-        width: isSquareScreen ? 40 : 50, 
-        height: isSquareScreen ? 40 : 50, 
-        justifyContent: 'center', 
-        alignItems: 'center' 
+        width: isSquareScreen ? 38 : 46, 
+        height: isSquareScreen ? 38 : 46
     },
     appName: { 
-        fontSize: isSquareScreen ? 16 : 18, 
-        fontWeight: '700', 
-        color: 'white' 
+        fontSize: isSquareScreen ? 15 : 16, 
+        fontWeight: '700' 
     },
     appSubtitle: { 
-        fontSize: isSquareScreen ? 11 : 12, 
-        color: 'rgba(255,255,255,0.7)', 
+        fontSize: isSquareScreen ? 10 : 11, 
         marginTop: 2 
     },
     dateText: {
-        fontSize: isSquareScreen ? 7 : 8
+        fontSize: isSquareScreen ? 6 : 7
     },
-    whiteText: { 
-        color: 'white' 
-    },
-    whiteSubtitle: { 
-        color: 'rgba(255,255,255,0.7)' 
-    },
-    amountContainer: { 
-        marginBottom: isSquareScreen ? 20 : 30, 
-        zIndex: 10 
-    },
+    whiteText: { color: 'white' },
+    whiteSubtitle: { color: 'rgba(255,255,255,0.7)' },
+    amountContainer: { marginBottom: isSquareScreen ? 18 : 28, zIndex: 10 },
     inputLabel: { 
-        fontSize: isSquareScreen ? 13 : 14, 
-        color: 'rgba(255,255,255,0.7)', 
-        marginBottom: isSquareScreen ? 8 : 10, 
+        fontSize: isSquareScreen ? 12 : 13, 
+        marginBottom: isSquareScreen ? 6 : 8, 
         fontWeight: '500' 
     },
     inputWrapper: { 
         flexDirection: 'row', 
         alignItems: 'center', 
         backgroundColor: 'rgba(255,255,255,0.15)', 
-        borderRadius: isSquareScreen ? 18 : 20, 
-        paddingHorizontal: isSquareScreen ? 12 : 15, 
-        paddingVertical: 5 
+        borderRadius: isSquareScreen ? 16 : 18, 
+        paddingHorizontal: isSquareScreen ? 10 : 12, 
+        paddingVertical: 4 
     },
     currencySymbol: { 
-        fontSize: isSquareScreen ? 20 : 24, 
+        fontSize: isSquareScreen ? 18 : 22, 
         fontWeight: 'bold', 
-        color: 'white', 
-        marginRight: isSquareScreen ? 8 : 10 
+        marginRight: isSquareScreen ? 6 : 8 
     },
     amountInput: { 
         flex: 1, 
-        fontSize: isSquareScreen ? 20 : 24, 
+        fontSize: isSquareScreen ? 18 : 22, 
         fontWeight: 'bold', 
-        color: 'white', 
-        paddingVertical: isSquareScreen ? 10 : 12, 
-        minHeight: isSquareScreen ? 42 : 50 
+        paddingVertical: isSquareScreen ? 8 : 10, 
+        minHeight: isSquareScreen ? 38 : 46 
     },
-    whiteTextInput: { 
-        color: 'white' 
-    },
-    switchSection: { 
-        marginBottom: isSquareScreen ? 18 : 25, 
-        zIndex: 10, 
-        alignItems: 'center' 
-    },
-    conversionContainer: { 
-        alignItems: 'center', 
-        marginBottom: isSquareScreen ? 20 : 30, 
-        zIndex: 10 
-    },
-    conversionLabel: { 
-        fontSize: isSquareScreen ? 14 : 16, 
-        color: 'rgba(255,255,255,0.7)', 
-        marginBottom: isSquareScreen ? 8 : 10, 
-        textAlign: 'center', 
-        fontWeight: '500' 
-    },
-    conversionAmount: { 
-        fontSize: isSquareScreen ? 24 : 28, 
-        fontWeight: 'bold', 
-        color: 'white', 
-        textAlign: 'center' 
-    },
-    rateInfo: {
-        color: 'rgba(255,255,255,0.6)', 
-        marginTop: 5, 
-        fontSize: isSquareScreen ? 10 : 12,
-        textAlign: 'center'
-    },
-    actionButtons: { 
-        flexDirection: 'row', 
-        gap: isSquareScreen ? 10 : 12, 
-        zIndex: 10 
-    },
-    simpleBtn: { 
-        flex: 1, 
-        paddingVertical: isSquareScreen ? 12 : 14, 
-        borderRadius: isSquareScreen ? 22 : 25, 
-        backgroundColor: 'rgba(255, 255, 255, 0.15)', 
-        justifyContent: 'center', 
-        alignItems: 'center' 
-    },
-    simpleBtnText: { 
-        fontSize: isSquareScreen ? 14 : 16, 
-        fontWeight: '600', 
-        color: 'white' 
-    },
-    convertBtn: { 
-        backgroundColor: 'white' 
-    },
-    convertBtnText: { 
-        color: '#0f065a' 
-    },
+    whiteTextInput: { color: 'white' },
+    switchSection: { marginBottom: isSquareScreen ? 14 : 20, zIndex: 10, alignItems: 'center' },
+    conversionContainer: { alignItems: 'center', marginBottom: isSquareScreen ? 18 : 28, zIndex: 10 },
+    conversionLabel: { fontSize: isSquareScreen ? 13 : 14, marginBottom: isSquareScreen ? 6 : 8, textAlign: 'center', fontWeight: '500' },
+    conversionAmount: { fontSize: isSquareScreen ? 22 : 26, fontWeight: 'bold', textAlign: 'center' },
+    rateInfo: { marginTop: 4, fontSize: isSquareScreen ? 9 : 11, textAlign: 'center', color: 'rgba(255,255,255,0.6)' },
+    actionButtons: { flexDirection: 'row', gap: isSquareScreen ? 8 : 10, zIndex: 10 },
+    simpleBtn: { flex: 1, paddingVertical: isSquareScreen ? 10 : 12, borderRadius: isSquareScreen ? 20 : 22, backgroundColor: 'rgba(255,255,255,0.15)', justifyContent: 'center', alignItems: 'center' },
+    simpleBtnText: { fontSize: isSquareScreen ? 13 : 14, fontWeight: '600', color: 'white' },
+    convertBtn: { backgroundColor: 'white' },
+    convertBtnText: { color: '#0f065a' },
 });
