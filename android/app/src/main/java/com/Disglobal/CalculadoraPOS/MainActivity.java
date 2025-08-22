@@ -1,4 +1,4 @@
-package com.Disglobal.CalculadoraPOS;
+package com.keivrp.dischange;
 
 import android.os.Build;
 import android.os.Bundle;

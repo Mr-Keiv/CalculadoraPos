@@ -113,6 +113,7 @@ export default function CurrencyConverterScreen() {
                                 <Text style={[styles.appSubtitle, styles.whiteSubtitle]}>Conversor de divisas</Text>
                                 <Text style={[styles.appSubtitle, styles.whiteSubtitle, styles.dateText]} numberOfLines={2}>
                                     {lastUpdate?.toLocaleString('es-ES', {
+                                        day: '2-digit',
                                         month: 'long',
                                         year: 'numeric',
                                         hour: '2-digit',
@@ -183,7 +184,15 @@ export default function CurrencyConverterScreen() {
 
                     {/* Action Buttons */}
                     <View style={styles.actionButtons}>
-                        <TouchableOpacity style={[styles.simpleBtn, styles.convertBtn]} onPress={() => setIsPortalVisible(true)}>
+                        <TouchableOpacity 
+                            style={[
+                                styles.simpleBtn, 
+                                styles.convertBtn,
+                                (!amount || parseFloat(amount) === 0) && { opacity: 0.5 }
+                            ]} 
+                            onPress={() => setIsPortalVisible(true)}
+                            disabled={!amount || parseFloat(amount) === 0}
+                        >
                             <Text style={[styles.simpleBtnText, styles.convertBtnText]}>Pagar</Text>
                         </TouchableOpacity>
                     </View>
@@ -224,7 +233,7 @@ const styles = StyleSheet.create({
         borderRadius: isSquareScreen ? 22 : 25,
         padding: isSquareScreen ? 16 : 20,
         position: 'relative',
-        minHeight: isSquareScreen ? height * 0.85 : height * 0.82,
+        minHeight: isSquareScreen ? height * 0.85 : height * 0.92,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.18,

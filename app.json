@@ -2,7 +2,7 @@
   "expo": {
     "name": "CalculadoraPOS",
     "slug": "CalculadoraPOS",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +22,7 @@
         "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#0a043c"
       },
-      "package": "com.Disglobal.CalculadoraPOS"
+      "package": "com.keivrp.dischange"
     },
     "web": {
       "favicon": "./assets/logo.png"
