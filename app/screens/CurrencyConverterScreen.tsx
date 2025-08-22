@@ -112,7 +112,13 @@ export default function CurrencyConverterScreen() {
                                 <Text style={[styles.appName, styles.whiteText]}>Calculadora</Text>
                                 <Text style={[styles.appSubtitle, styles.whiteSubtitle]}>Conversor de divisas</Text>
                                 <Text style={[styles.appSubtitle, styles.whiteSubtitle, styles.dateText]} numberOfLines={2}>
-                                    {lastUpdate?.toLocaleDateString()}
+                                    {lastUpdate?.toLocaleString('es-ES', {
+                                        month: 'long',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        second: '2-digit'
+                                    })}
                                 </Text>
                             </View>
                         </View>
@@ -143,10 +149,20 @@ export default function CurrencyConverterScreen() {
                                 ref={amountInputRef}
                                 style={[styles.amountInput, styles.whiteTextInput]}
                                 value={amount}
-                                onChangeText={setAmount}
+                                onChangeText={(text) => {
+                                    // Only allow numbers and up to 2 decimal places
+                                    const regex = /^\d*\.?\d{0,2}$/;
+                                    if (regex.test(text)) {
+                                        const numValue = parseFloat(text);
+                                        // Prevent negative numbers and zero
+                                        if (!text || (numValue > 0)) {
+                                            setAmount(text);
+                                        }
+                                    }
+                                }}
                                 placeholder="0.00"
                                 placeholderTextColor="rgba(255,255,255,0.6)"
-                                keyboardType="numeric"
+                                keyboardType="decimal-pad"
                                 returnKeyType="done"
                             />
                         </View>
@@ -250,7 +266,7 @@ const styles = StyleSheet.create({
         marginTop: 2 
     },
     dateText: {
-        fontSize: isSquareScreen ? 6 : 7
+        fontSize: isSquareScreen ? 8 : 9
     },
     whiteText: { color: 'white' },
     whiteSubtitle: { color: 'rgba(255,255,255,0.7)' },
